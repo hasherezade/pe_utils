@@ -3,6 +3,14 @@
 
 #include <peconv.h> // include libPeConv header
 
+#ifndef COMIMAGE_FLAGS_32BITPREFERRED
+#define COMIMAGE_FLAGS_32BITPREFERRED 0x20000
+#endif
+
+#ifndef COMIMAGE_FLAGS_32BITREQUIRED
+#define COMIMAGE_FLAGS_32BITREQUIRED 0x00002
+#endif
+
 typedef enum {
 	PE_UNKNOWN = 0,
 	PE_32BIT = 32,

@@ -76,7 +76,9 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2) {
 		std::cout << "Checks if the given PE will run as 32 or 64 bit.\n"
-			<< "Returns the number of bits." << std::endl;
+			<< "Returns the number of bits.\n"
+			"URL: https://github.com/hasherezade/pe_check\n"
+			<< std::endl;
 		std::cout << "args: <path to the PE>" << std::endl;
 
 		system("pause");

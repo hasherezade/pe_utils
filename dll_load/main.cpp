@@ -15,6 +15,7 @@ size_t split_list(const std::string &sline, const char delimiter, std::vector<st
 
 int wmain(int argc, wchar_t *argv[])
 {
+	int is_dll_executed = 0;
 #ifdef _WIN64
 	bool is_on_64 = true;
 #else
@@ -37,11 +38,12 @@ int wmain(int argc, wchar_t *argv[])
 	wchar_t* pe_path = argv[1];
 	HMODULE lib =  LoadLibraryW(pe_path);
 	if (!lib) {
-		return 0;
+		return is_dll_executed;
 	}
+	is_dll_executed = 1;
 	if (argc < 3) {
 		// no more args to process
-		return 1;
+		return is_dll_executed;
 	}
 	std::wstring paramsl = argv[2];
 	std::string params(paramsl.begin(), paramsl.end());
@@ -70,5 +72,5 @@ int wmain(int argc, wchar_t *argv[])
 		int(*exp_func)() = (int(*)())func;
 		func();
 	}
-	return 0;
+	return is_dll_executed;
 }

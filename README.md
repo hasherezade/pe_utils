@@ -3,5 +3,5 @@
 
 Set of small utilities, helpers for PIN Tools
 
-+ **pe_check** - an app checking the PE architecture
-+ **dll_load** - loads a DLL
++ **pe_check** - Checks the bitness of the PE.
++ **dll_load** - Loads a given DLL. Calls exported functions if supplied.

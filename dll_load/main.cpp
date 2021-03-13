@@ -22,16 +22,18 @@ int wmain(int argc, wchar_t *argv[])
 	bool is_on_64 = false;
 #endif
 	if (argc < 2) {
-		std::cout << "Loads a given DLL. May call exported functions if supplied.\n";
+		std::cout << "Loads a given DLL. Calls exported functions if supplied.\n";
 		if (is_on_64) {
 			std::cout << "64-bit version\n" << std::endl;
 		}
 		else {
 			std::cout << "32-bit version\n" << std::endl;
 		}
-		std::cout << "args: <path to the PE>" << std::endl;
 		std::cout << "Args: <DLL> [*exports]\n";
-		std::cout << "\t * - optional]\n";
+		std::cout << "\t* - optional\n";
+		std::cout << "\texports: a list of functions separated by ';'. Examples:\n";
+		std::cout << "\t DllRegisterServer;DllUnregisterServer\n";
+		std::cout << "\t #1;#2\n";
 		system("pause");
 		return 0;
 	}

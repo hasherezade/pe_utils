@@ -1,5 +1,5 @@
 # PE utils
-[![Build status](https://ci.appveyor.com/api/projects/status/d59ouubyha1h6n9f?svg=true)](https://ci.appveyor.com/project/hasherezade/pe-check)
+[![Build status](https://ci.appveyor.com/api/projects/status/0o7akheju8te49d6?svg=true)](https://ci.appveyor.com/project/hasherezade/pe-utils)
 
 Set of small utilities, helpers for PIN Tools
 

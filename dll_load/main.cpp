@@ -50,18 +50,15 @@ int wmain(int argc, wchar_t *argv[])
 {
 	int is_dll_executed = 0;
 #ifdef _WIN64
-	bool is_on_64 = true;
+	int bitness = 64;
 #else
-	bool is_on_64 = false;
+	int bitness = 32;
 #endif
 	if (argc < 2) {
 		std::cout << "Loads a given DLL. Calls exported functions if supplied.\n";
-		if (is_on_64) {
-			std::cout << "64-bit version\n" << std::endl;
-		}
-		else {
-			std::cout << "32-bit version\n" << std::endl;
-		}
+		std::cout << std::dec << bitness << "-bit version\n";
+		std::cout << "Built on: " __DATE__ << "\n";
+		std::cout << std::endl;
 		std::cout << "Args: <DLL> [*exports]\n";
 		std::cout << "\t* - optional\n";
 		std::cout << "\texports: a list of functions separated by ';'. Examples:\n";

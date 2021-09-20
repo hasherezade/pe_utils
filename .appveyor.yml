@@ -1,8 +1,9 @@
 os:
   - Visual Studio 2015
-
-platform: x86
-
+  
+platform: x64
+  - x64
+  
 branches:
   only:
     - master
@@ -16,23 +17,29 @@ build:
 
 configuration:
   - Release
-
+  
 environment:
   artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(CONFIGURATION)
-
+  matrix:
+    - env_arch: "x64"
+    - env_arch: "x86"
+  
 before_build:
   - mkdir build
   - cd build
-  - cmake ..
+  - if [%env_arch%]==[x64] (
+    cmake .. -A x64 )
+  - if [%env_arch%]==[x86] (
+    cmake .. )
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=%APPVEYOR_BUILD_FOLDER%/%APPVEYOR_REPO_COMMIT% ..
   
 build_script:
   - cmake --build . --config %CONFIGURATION% --target install
-
+  
 after_build:
   - mkdir %artifactName%
   - cp %APPVEYOR_BUILD_FOLDER%/%APPVEYOR_REPO_COMMIT%/* %artifactName%
 
 artifacts:
   - path: build\%artifactName%
-
+  

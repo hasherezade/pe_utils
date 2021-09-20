@@ -9,6 +9,6 @@ Set of small, self-contained utilities to be used in other toolkits, i.e. as hel
 
 You can display the returned values of **pe_check** and **kdb_check** by:
 
-```
+```cmd
 echo %errorlevel%
 ```

@@ -3,8 +3,6 @@
 #include <vector>
 #include <sstream>
 
-#define PAUSE_AFTER
-
 size_t split_list(const std::string &sline, const char delimiter, std::vector<std::string> &args)
 {
 	std::istringstream f(sline);

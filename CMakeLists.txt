@@ -1,6 +1,6 @@
 cmake_minimum_required ( VERSION 3.0 )
 
-project ( pe_check )
+project ( pe_utils )
 
 # libs
 # modules:

@@ -50,16 +50,31 @@ size_t extract_from_dll(IN const std::string &path, size_t startSyscallID, OUT s
 	return extracted_count;
 }
 
+int loadInt(const std::string& str, bool as_hex)
+{
+	int intVal = 0;
+
+	std::stringstream ss;
+	ss << (as_hex ? std::hex : std::dec) << str;
+	ss >> intVal;
+
+	return intVal;
+}
+
 int main(int argc, char *argv[])
 {
 	LPCSTR pe_path = NULL;
+	int startID = 0;
 	if (argc < 2) {
 		std::cout << "Extract syscalls from system DLLs (ntdll.dll, win32u.dll)\n"
-			<< "Optional Arg: <DLL path>"
+			<< "\tOptional Args: <DllPath> <startSyscallID:hex>"
 			<< std::endl;
 	}
 	else {
 		pe_path = argv[1];
+		if (argc > 2) {
+			startID = loadInt(argv[2], true);
+		}
 	}
 
 	PVOID old_val = NULL;
@@ -69,7 +84,7 @@ int main(int argc, char *argv[])
 	size_t extracted_count = 0;
 
 	if (pe_path) {
-		extracted_count += extract_from_dll(pe_path, 0, outs);
+		extracted_count += extract_from_dll(pe_path, startID, outs);
 	}
 	else {
 		char ntdll_path[MAX_PATH] = { 0 };

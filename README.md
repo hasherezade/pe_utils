@@ -3,7 +3,7 @@
 
 Set of small, self-contained utilities to be used in other toolkits, i.e. as helpers for PIN Tools ([example](https://github.com/hasherezade/tiny_tracer/tree/master/install32_64)).
 
-+ **syscall_extractor** - Extract syscalls from a supplied NTDLL into a CSV file
++ **syscall_extractor** - Extract syscalls from system DLLs (ntdll.dll, win32u.dll) into a CSV file
 + **dll_load** - Loads a given DLL. Calls exported functions if supplied.
 + **pe_check** - Checks the bitness of the PE and outputs it as a return value.
 + **kdb_check** - Checks if the Kernel Debugger is enabled (no elevation required). Outputs the status as a return value.

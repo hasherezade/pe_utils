@@ -9,11 +9,12 @@ include_directories ( ${PECONV_DIR}/include )
 
 set (srcs
 	main.cpp
+	util.cpp
 )
 
 # general headers - they will be used for both EXE and DLL:
 set (hdrs
-#put your headers here
+	util.h
 )
 
 set (rsrc

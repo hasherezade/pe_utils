@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include <peconv.h> // include libPeConv header
-
+#include "util.h"
 
 size_t extract_syscalls(BYTE* pe_buf, size_t pe_size, std::stringstream& outs)
 {
@@ -31,6 +31,7 @@ size_t extract_syscalls(BYTE* pe_buf, size_t pe_size, std::stringstream& outs)
 	return id;
 }
 
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2) {
@@ -42,8 +43,14 @@ int main(int argc, char *argv[])
 	}
 	LPCSTR pe_path = argv[1];
 	size_t bufsize = 0;
+
+	PVOID old_val;
+	util::wow64_disable_fs_redirection(&old_val);
 	BYTE *buffer = peconv::load_pe_module(pe_path, bufsize, false, false);
+	util::wow64_revert_fs_redirection(&old_val);
+
 	if (!buffer) {
+		std::cerr << "Failed to load the PE!\n";
 		return 0;
 	}
 	std::stringstream outs;

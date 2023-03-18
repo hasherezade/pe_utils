@@ -6,6 +6,7 @@ Set of small, self-contained utilities to be used in other toolkits, i.e. as hel
 + **dll_load** - Loads a given DLL. Calls exported functions if supplied.
 + **pe_check** - Checks the bitness of the PE and outputs it as a return value.
 + **kdb_check** - Checks if the Kernel Debugger is enabled (no elevation required). Outputs the status as a return value.
++ **syscall_extractor** - Extract syscalls from a supplied NTDLL into a CSV file
 
 You can display the returned values of **pe_check** and **kdb_check** by:
 

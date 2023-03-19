@@ -5,17 +5,35 @@
 #include <peconv.h> // include libPeConv header
 #include "util.h"
 
+bool isSyscallFunc(const std::string &funcName)
+{
+	std::string prefix("Nt");
+	if (funcName.size() < (prefix.size() + 1)) {
+		return false;
+	}
+	if (funcName.compare(0, prefix.size(), prefix) != 0) {
+		return false;
+	}
+	char afterPrefix = funcName.at(prefix.size());
+	if (afterPrefix >= 'A' && afterPrefix <= 'Z') {
+		// the name of the function after the Nt prefix will start in uppercase,
+		// syscalls are in functions like: NtUserSetWindowLongPtr, but not: NtdllDefWindowProc_A
+		return true;
+	}
+	return false;
+}
+
 size_t extract_syscalls(BYTE* pe_buf, size_t pe_size, std::stringstream& outs, size_t startID = 0)
 {
 	std::vector<std::string> names_list;
 	if (!peconv::get_exported_names(pe_buf, names_list)) {
 		return 0;
 	}
-	std::string prefix("Nt");
+
 	std::map<DWORD, std::string> sys_functions;
 	for (auto itr = names_list.begin(); itr != names_list.end(); ++itr) {
 		std::string funcName = *itr;
-		if (!funcName.compare(0, prefix.size(), prefix)) {
+		if (isSyscallFunc(funcName)) {
 			ULONG_PTR va = (ULONG_PTR)peconv::get_exported_func(pe_buf, funcName.c_str());
 			if (!va) continue;
 

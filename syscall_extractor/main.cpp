@@ -73,7 +73,8 @@ int main(int argc, char *argv[])
 	std::string outFileName = "syscalls.txt";
 	if (argc < 2) {
 		std::cout << "Extract syscalls from system DLLs (ntdll.dll, win32u.dll)\n"
-			<< "\tOptional: <out path>"
+			<< "Source: https://github.com/hasherezade/pe_utils\n"
+			<< "\tOptional arg: <out path>"
 			<< std::endl;
 	}
 	else {

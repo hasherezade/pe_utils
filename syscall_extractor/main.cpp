@@ -68,31 +68,16 @@ size_t extract_from_dll(IN const std::string &path, size_t startSyscallID, OUT s
 	return extracted_count;
 }
 
-int loadInt(const std::string& str, bool as_hex)
-{
-	int intVal = 0;
-
-	std::stringstream ss;
-	ss << (as_hex ? std::hex : std::dec) << str;
-	ss >> intVal;
-
-	return intVal;
-}
-
 int main(int argc, char *argv[])
 {
-	LPCSTR pe_path = NULL;
-	int startID = 0;
+	std::string outFileName = "syscalls.txt";
 	if (argc < 2) {
 		std::cout << "Extract syscalls from system DLLs (ntdll.dll, win32u.dll)\n"
-			<< "\tOptional Args: <DllPath> <startSyscallID:hex>"
+			<< "\tOptional: <out path>"
 			<< std::endl;
 	}
 	else {
-		pe_path = argv[1];
-		if (argc > 2) {
-			startID = loadInt(argv[2], true);
-		}
+		outFileName = argv[1];
 	}
 
 	PVOID old_val = NULL;
@@ -101,27 +86,21 @@ int main(int argc, char *argv[])
 	std::stringstream outs;
 	size_t extracted_count = 0;
 
-	if (pe_path) {
-		extracted_count += extract_from_dll(pe_path, startID, outs);
-	}
-	else {
-		char ntdll_path[MAX_PATH] = { 0 };
-		ExpandEnvironmentStringsA("%SystemRoot%\\system32\\ntdll.dll", ntdll_path, MAX_PATH);
-		extracted_count += extract_from_dll(ntdll_path, 0, outs);
+	char ntdll_path[MAX_PATH] = { 0 };
+	ExpandEnvironmentStringsA("%SystemRoot%\\system32\\ntdll.dll", ntdll_path, MAX_PATH);
+	extracted_count += extract_from_dll(ntdll_path, 0, outs);
 
-		char win32u_path[MAX_PATH] = { 0 };
-		ExpandEnvironmentStringsA("%SystemRoot%\\system32\\win32u.dll", win32u_path, MAX_PATH);
-		extracted_count += extract_from_dll(win32u_path, 0x1000, outs);
-	}
+	char win32u_path[MAX_PATH] = { 0 };
+	ExpandEnvironmentStringsA("%SystemRoot%\\system32\\win32u.dll", win32u_path, MAX_PATH);
+	extracted_count += extract_from_dll(win32u_path, 0x1000, outs);
 
 	util::wow64_revert_fs_redirection(&old_val);
 
 	if (!extracted_count) {
 		std::cerr << "Failed to extract syscalls.\n";
-		return 0;
+		return (-1);
 	}
 
-	std::string outFileName = "syscalls.txt";
 	std::ofstream myfile;
 	myfile.open(outFileName);
 	myfile << outs.str();

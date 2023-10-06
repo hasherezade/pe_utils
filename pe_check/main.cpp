@@ -17,23 +17,51 @@ typedef enum {
 	PE_64BIT = 64
 } t_bitness;
 
+namespace util {
+	bool is_wow_64(HANDLE process)
+	{
+		FARPROC procPtr = GetProcAddress(GetModuleHandleA("kernel32"), "IsWow64Process");
+		if (!procPtr) {
+			//this system does not have a function IsWow64Process
+			return false;
+		}
+		BOOL(WINAPI * is_process_wow64)(IN HANDLE, OUT PBOOL)
+			= (BOOL(WINAPI*)(IN HANDLE, OUT PBOOL))procPtr;
 
-bool is_wow_64(HANDLE process)
-{
-	FARPROC procPtr = GetProcAddress(GetModuleHandleA("kernel32"), "IsWow64Process");
-	if (!procPtr) {
-		//this system does not have a function IsWow64Process
-		return false;
+		BOOL isCurrWow64 = FALSE;
+		if (!is_process_wow64(process, &isCurrWow64)) {
+			return false;
+		}
+		return isCurrWow64 ? true : false;
 	}
-	BOOL(WINAPI * is_process_wow64)(IN HANDLE, OUT PBOOL)
-		= (BOOL(WINAPI*)(IN HANDLE, OUT PBOOL))procPtr;
 
-	BOOL isCurrWow64 = FALSE;
-	if (!is_process_wow64(process, &isCurrWow64)) {
-		return false;
+	BOOL wow64_disable_fs_redirection(OUT PVOID* OldValue)
+	{
+		FARPROC procPtr = GetProcAddress(GetModuleHandleA("kernel32"), "Wow64DisableWow64FsRedirection");
+		if (!procPtr) return FALSE;
+
+		BOOL(WINAPI * _Wow64DisableWow64FsRedirection)(OUT PVOID*) = (BOOL(WINAPI*) (OUT PVOID*))procPtr;
+
+		if (!_Wow64DisableWow64FsRedirection) {
+			return FALSE;
+		}
+		return _Wow64DisableWow64FsRedirection(OldValue);
 	}
-	return isCurrWow64 ? true : false;
-}
+
+	BOOL wow64_revert_fs_redirection(IN PVOID OldValue)
+	{
+		FARPROC procPtr = GetProcAddress(GetModuleHandleA("kernel32"), "Wow64RevertWow64FsRedirection");
+		if (!procPtr) return FALSE;
+
+		BOOL(WINAPI * _Wow64RevertWow64FsRedirection)(IN PVOID) = (BOOL(WINAPI*) (IN PVOID))procPtr;
+
+		if (!_Wow64RevertWow64FsRedirection) {
+			return FALSE;
+		}
+		return _Wow64RevertWow64FsRedirection(OldValue);
+	}
+};
+
 
 t_bitness get_bitness(BYTE *buffer, size_t buffer_size)
 {
@@ -60,7 +88,7 @@ t_bitness get_bitness(BYTE *buffer, size_t buffer_size)
 #ifdef _WIN64
 	bool is_on_64 = true;
 #else
-	bool is_on_64 = is_wow_64(GetCurrentProcess());
+	bool is_on_64 = util::is_wow_64(GetCurrentProcess());
 #endif
 	if (is_on_64 && !is_real_32) {
 		// the system is 64 bit, so the .NET app got switched to the 64 bit mode
@@ -84,9 +112,14 @@ int main(int argc, char *argv[])
 		system("pause");
 		return 0;
 	}
+
+	VOID* old_val = NULL;
+	util::wow64_disable_fs_redirection(&old_val);
 	LPCSTR pe_path = argv[1];
 	size_t bufsize = 0;
 	BYTE *buffer = peconv::load_pe_module(pe_path, bufsize, false, false);
+	util::wow64_revert_fs_redirection(&old_val);
+
 	if (!buffer) {
 		return 0;
 	}

@@ -60,6 +60,38 @@ namespace util {
 		}
 		return _Wow64RevertWow64FsRedirection(OldValue);
 	}
+
+	BYTE* read_from_file(IN LPCTSTR in_path, IN size_t max_size, IN OUT size_t& read_size)
+	{
+		HANDLE file = CreateFile(in_path, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		if (file == INVALID_HANDLE_VALUE) {
+#ifdef _DEBUG
+			std::cerr << "Cannot open the file for reading!" << std::endl;
+#endif
+			return nullptr;
+		}
+		DWORD r_size = max_size;
+		DWORD f_size = GetFileSize(file, 0) + 1;
+		if (f_size < r_size) {
+			r_size = f_size;
+		}
+		BYTE* buffer = (BYTE*)::calloc(r_size, 1);
+		if (!buffer) {
+			return nullptr;
+		}
+
+		DWORD out_size = 0;
+		if (!ReadFile(file, buffer, r_size, &out_size, nullptr)) {
+			::free(buffer);
+			buffer = nullptr;
+			read_size = 0;
+		}
+		else {
+			read_size = r_size;
+		}
+		CloseHandle(file);
+		return buffer;
+	}
 };
 
 
@@ -116,8 +148,8 @@ int main(int argc, char *argv[])
 	VOID* old_val = NULL;
 	util::wow64_disable_fs_redirection(&old_val);
 	LPCSTR pe_path = argv[1];
-	size_t bufsize = 0;
-	BYTE *buffer = peconv::load_pe_module(pe_path, bufsize, false, false);
+	size_t bufsize = 0; 
+	BYTE *buffer = util::read_from_file(pe_path, 0x1000, bufsize);
 	util::wow64_revert_fs_redirection(&old_val);
 
 	if (!buffer) {
@@ -125,7 +157,7 @@ int main(int argc, char *argv[])
 	}
 
 	t_bitness my_bitness = get_bitness(buffer, bufsize);
-	peconv::free_pe_buffer(buffer);
+	::free(buffer);
 #ifdef _DEBUG
 	std::cout << "Bitness: " << my_bitness << "\n";
 #endif
